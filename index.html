@@ -1,0 +1,74 @@
+<!DOCTYPE html><html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KebunKita</title>
+  <style>
+    body { font-family: sans-serif; background: #f0f9f0; text-align: center; }
+    h1 { color: #2d572c; }
+    .farm-grid { display: grid; grid-template-columns: repeat(4, 80px); gap: 10px; justify-content: center; }
+    .plot { width: 80px; height: 80px; background: #d2b48c; border: 2px solid #8b5a2b; font-size: 12px; cursor: pointer; }
+    .wallet { margin-top: 20px; font-size: 18px; color: #333; }
+    .barter-box { margin-top: 30px; padding: 10px; background: #fff3cd; border: 1px solid #ffeeba; display: inline-block; }
+  </style>
+</head>
+<body>
+  <h1>KebunKita</h1>
+  <div class="farm-grid" id="farm"></div>  <div class="wallet">
+    TaniKitaCoin: <span id="wallet">0</span>
+  </div>  <div class="barter-box">
+    <h3>Barter Koin</h3>
+    <input type="number" id="amount" placeholder="Jumlah" />
+    <select id="targetCoin">
+      <option value="BitCrafterCoin">BitCrafterCoin</option>
+      <option value="SawahToken">SawahToken</option>
+    </select>
+    <button onclick="barter()">Tukar</button>
+  </div>  <script>
+    const walletDisplay = document.getElementById('wallet');
+    const farm = document.getElementById('farm');
+    let wallet = parseInt(localStorage.getItem('wallet') || '0');
+    walletDisplay.innerText = wallet;
+
+    const growTime = 3000; // 3 detik panen
+
+    for (let i = 0; i < 16; i++) {
+      const plot = document.createElement('div');
+      plot.classList.add('plot');
+      plot.dataset.state = 'empty';
+      plot.innerText = 'Kosong';
+      plot.onclick = () => plant(plot);
+      farm.appendChild(plot);
+    }
+
+    function plant(plot) {
+      if (plot.dataset.state !== 'empty') return;
+      plot.dataset.state = 'growing';
+      plot.style.background = '#9acd32';
+      plot.innerText = 'Menanam...';
+      setTimeout(() => harvest(plot), growTime);
+    }
+
+    function harvest(plot) {
+      plot.dataset.state = 'empty';
+      plot.style.background = '#d2b48c';
+      plot.innerText = 'Kosong';
+      wallet += 1;
+      localStorage.setItem('wallet', wallet);
+      walletDisplay.innerText = wallet;
+    }
+
+    function barter() {
+      const amount = parseInt(document.getElementById('amount').value);
+      const target = document.getElementById('targetCoin').value;
+      if (wallet < amount || isNaN(amount) || amount <= 0) {
+        alert('Jumlah tidak valid atau koin tidak cukup.');
+        return;
+      }
+      wallet -= amount;
+      localStorage.setItem('wallet', wallet);
+      walletDisplay.innerText = wallet;
+      alert(`Tukar ${amount} TaniKitaCoin ke ${target}`);
+    }
+  </script></body>
+</html>
